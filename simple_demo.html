@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StPageFlip 硬翻页效果演示</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .title {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .book-container {
+            width: 800px;
+            height: 600px;
+            margin: 0 auto 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: #f8f8f8;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 0 10px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 页面内容样式 */
+        .page {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            box-sizing: border-box;
+            text-align: center;
+            position: relative;
+        }
+
+        .page.cover {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+        }
+
+        .page.content-1 {
+            background: linear-gradient(135deg, #4834d4 0%, #686de0 100%);
+            color: white;
+        }
+
+        .page.content-2 {
+            background: linear-gradient(135deg, #00d2d3 0%, #54a0ff 100%);
+            color: white;
+        }
+
+        .page.content-3 {
+            background: linear-gradient(135deg, #ff9ff3 0%, #f368e0 100%);
+            color: white;
+        }
+
+        .page.back-cover {
+            background: linear-gradient(135deg, #5f27cd 0%, #341f97 100%);
+            color: white;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .page-content {
+            font-size: 18px;
+            line-height: 1.6;
+            max-width: 300px;
+        }
+
+        .info {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            max-width: 800px;
+        }
+
+        .page-indicator {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .loading {
+            text-align: center;
+            margin: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">StPageFlip 硬翻页效果演示</h1>
+        
+        <div class="loading" id="loading">正在加载页面翻转库...</div>
+        
+        <div class="book-container" id="book"></div>
+        
+        <div class="controls" id="controls" style="display: none;">
+            <button class="btn" onclick="prevPage()">← 上一页</button>
+            <button class="btn" onclick="nextPage()">下一页 →</button>
+            <button class="btn" onclick="flipToFirst()">首页</button>
+            <button class="btn" onclick="flipToLast()">末页</button>
+        </div>
+    </div>
+
+    <div class="info">
+        <h3>🔧 修改特性</h3>
+        <ul>
+            <li><strong>摄像机距离增加</strong>：使用 2.5倍 页面尺寸的距离</li>
+            <li><strong>视角调整</strong>：摄像机稍微向书页底部偏移 30%</li>
+            <li><strong>3D透视增强</strong>：增强的 perspective 和 transform-style 属性</li>
+            <li><strong>硬页翻页优化</strong>：更流畅自然的硬页翻页动画效果</li>
+        </ul>
+        
+        <h3>📖 使用说明</h3>
+        <ul>
+            <li>点击按钮或拖拽页面角落进行翻页</li>
+            <li>所有页面都设置为硬页面 (data-density="hard")</li>
+            <li>体验改进后的3D翻页视觉效果</li>
+            <li>注意观察翻页时的摄像机角度变化</li>
+        </ul>
+    </div>
+
+    <!-- 隐藏的页面内容 -->
+    <div style="display: none;">
+        <div class="page cover" data-density="hard">
+            <div class="page-title">📚 硬翻页效果</div>
+            <div class="page-content">
+                StPageFlip 库的硬翻页效果演示<br>
+                改进的3D视觉体验
+            </div>
+            <div class="page-indicator">封面</div>
+        </div>
+
+        <div class="page content-1" data-density="hard">
+            <div class="page-title">🎯 第一页</div>
+            <div class="page-content">
+                这是第一页内容。<br>
+                注意翻页时的3D效果，<br>
+                摄像机视角已经调整为<br>
+                更远且稍微向下的角度。
+            </div>
+            <div class="page-indicator">第 1 页</div>
+        </div>
+
+        <div class="page content-2" data-density="hard">
+            <div class="page-title">⚡ 第二页</div>
+            <div class="page-content">
+                硬翻页效果的特点：<br>
+                • 增强的3D透视效果<br>
+                • 更自然的翻页角度<br>
+                • 流畅的动画过渡
+            </div>
+            <div class="page-indicator">第 2 页</div>
+        </div>
+
+        <div class="page content-3" data-density="hard">
+            <div class="page-title">🔧 第三页</div>
+            <div class="page-content">
+                技术改进：<br>
+                • 摄像机距离：2.5x页面尺寸<br>
+                • 垂直偏移：30%向底部<br>
+                • 增强的CSS 3D属性
+            </div>
+            <div class="page-indicator">第 3 页</div>
+        </div>
+
+        <div class="page back-cover" data-density="hard">
+            <div class="page-title">✨ 封底</div>
+            <div class="page-content">
+                感谢体验 StPageFlip<br>
+                硬翻页效果演示！<br><br>
+                改进后的摄像机视角<br>
+                带来更佳的视觉体验
+            </div>
+            <div class="page-indicator">封底</div>
+        </div>
+    </div>
+
+    <script>
+        let pageFlip;
+
+        // 动态加载PageFlip库
+        function loadPageFlipLibrary() {
+            const script = document.createElement('script');
+            script.src = './dist/js/page-flip.browser.js';
+            script.onload = function() {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('controls').style.display = 'block';
+                initPageFlip();
+            };
+            script.onerror = function() {
+                document.getElementById('loading').innerHTML = '❌ 加载失败：页面翻转库未找到';
+                console.error('Failed to load page-flip.browser.js');
+            };
+            document.head.appendChild(script);
+        }
+
+        // 初始化页面翻转
+        function initPageFlip() {
+            try {
+                pageFlip = new St.PageFlip(document.getElementById('book'), {
+                    width: 400,
+                    height: 600,
+                    size: 'stretch',
+                    minWidth: 320,
+                    maxWidth: 800,
+                    minHeight: 420,
+                    maxHeight: 600,
+                    drawShadow: true,
+                    flippingTime: 1000,
+                    usePortrait: true,
+                    startZIndex: 0,
+                    autoSize: false,
+                    maxShadowOpacity: 1,
+                    showCover: true,
+                    mobileScrollSupport: false,
+                    swipeDistance: 30,
+                    clickEventForward: true
+                });
+
+                // 加载页面
+                const pages = document.querySelectorAll('[data-density="hard"]');
+                pageFlip.loadFromHTML(pages);
+
+                // 监听翻页事件
+                pageFlip.on('flip', function(e) {
+                    console.log('当前页面:', e.data);
+                });
+
+                pageFlip.on('changeState', function(e) {
+                    console.log('状态变化:', e.data);
+                });
+
+                console.log('PageFlip初始化成功！');
+            } catch (error) {
+                console.error('初始化PageFlip失败:', error);
+                document.getElementById('loading').innerHTML = '❌ 初始化失败：' + error.message;
+            }
+        }
+
+        // 控制函数
+        function prevPage() {
+            if (pageFlip) pageFlip.flipPrev();
+        }
+
+        function nextPage() {
+            if (pageFlip) pageFlip.flipNext();
+        }
+
+        function flipToFirst() {
+            if (pageFlip) pageFlip.turnToPage(0);
+        }
+
+        function flipToLast() {
+            if (pageFlip) pageFlip.turnToPage(pageFlip.getPageCount() - 1);
+        }
+
+        // 页面加载完成后初始化
+        window.addEventListener('DOMContentLoaded', function() {
+            loadPageFlipLibrary();
+        });
+    </script>
+</body>
+</html>

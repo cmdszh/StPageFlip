@@ -79,8 +79,14 @@ export class HTMLPage extends Page {
 
     private drawHard(commonStyle = ''): void {
         const pos = this.render.getRect().left + this.render.getRect().width / 2;
+        const pageWidth = this.render.getRect().pageWidth;
+        const pageHeight = this.render.getRect().height;
 
         const angle = this.state.hardDrawingAngle;
+
+        // 计算摄像机位置：更远且稍微靠近底部
+        const cameraDistance = Math.max(pageWidth, pageHeight) * 2.5; // 增加距离
+        const verticalOffset = pageHeight * 0.3; // 向底部偏移
 
         const newStyle =
             commonStyle +
@@ -89,11 +95,13 @@ export class HTMLPage extends Page {
                 -webkit-backface-visibility: hidden;
                 clip-path: none;
                 -webkit-clip-path: none;
+                perspective: ${cameraDistance}px;
+                transform-style: preserve-3d;
             ` +
             (this.orientation === PageOrientation.LEFT
-                ? `transform-origin: ${this.render.getRect().pageWidth}px 0; 
+                ? `transform-origin: ${pageWidth}px ${verticalOffset}px; 
                    transform: translate3d(0, 0, 0) rotateY(${angle}deg);`
-                : `transform-origin: 0 0; 
+                : `transform-origin: 0px ${verticalOffset}px; 
                    transform: translate3d(${pos}px, 0, 0) rotateY(${angle}deg);`);
 
         this.element.style.cssText = newStyle;
