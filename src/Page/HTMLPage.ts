@@ -84,9 +84,9 @@ export class HTMLPage extends Page {
 
         const angle = this.state.hardDrawingAngle;
 
-        // 计算摄像机位置：更远且稍微靠近底部
+        // 计算摄像机位置：更远且向顶部偏移70%
         const cameraDistance = Math.max(pageWidth, pageHeight) * 2.5; // 增加距离
-        const verticalOffset = pageHeight * 0.3; // 向底部偏移
+        const verticalOffset = -pageHeight * 0.7; // 向顶部偏移70%
 
         const newStyle =
             commonStyle +
