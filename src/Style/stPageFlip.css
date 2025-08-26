@@ -28,7 +28,7 @@
   height: 100%;
   box-sizing: border-box;
   perspective: 3000px;
-  perspective-origin: center 70%;
+  perspective-origin: center 80%;
 }
 
 .stf__item {
@@ -39,7 +39,7 @@
 
 .stf__item.--hard {
   perspective: 3000px;
-  perspective-origin: center 70%;
+  perspective-origin: center 80%;
 }
 
 .stf__outerShadow {
